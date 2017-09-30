@@ -509,7 +509,7 @@ TransactionBuilder.prototype.addInput = function (txHash, vout, sequence, prevOu
   if (!this.__canModifyInputs()) {
     throw new Error('No, this would invalidate signatures')
   }
-
+  console.log(txHash.toString('hex'))
   var value
 
   // is it a hex string?
@@ -534,11 +534,14 @@ TransactionBuilder.prototype.addInput = function (txHash, vout, sequence, prevOu
 }
 
 TransactionBuilder.prototype.__addInputUnsafe = function (txHash, vout, options) {
+  console.log(options)
   if (Transaction.isCoinbaseHash(txHash)) {
     throw new Error('coinbase inputs not supported')
   }
 
   var prevTxOut = txHash.toString('hex') + ':' + vout
+  console.log('-------------')
+  console.log(prevTxOut)
   if (this.prevTxMap[prevTxOut] !== undefined) throw new Error('Duplicate TxOut: ' + prevTxOut)
 
   var input = {}
@@ -556,7 +559,6 @@ TransactionBuilder.prototype.__addInputUnsafe = function (txHash, vout, options)
   // derive what we can from the previous transactions output script
   if (!input.prevOutScript && options.prevOutScript) {
     var prevOutType
-
     if (!input.pubKeys && !input.signatures) {
       var expanded = expandOutput(options.prevOutScript)
 
@@ -573,7 +575,9 @@ TransactionBuilder.prototype.__addInputUnsafe = function (txHash, vout, options)
   }
 
   var vin = this.tx.addInput(txHash, vout, options.sequence, options.scriptSig)
+  console.log(vin)
   this.inputs[vin] = input
+  console.log(input)
   this.prevTxMap[prevTxOut] = vin
 
   return vin
@@ -583,12 +587,13 @@ TransactionBuilder.prototype.addOutput = function (scriptPubKey, value) {
   if (!this.__canModifyOutputs()) {
     throw new Error('No, this would invalidate signatures')
   }
+  console.log(scriptPubKey)
 
   // Attempt to get a script if it's a base58 address string
   if (typeof scriptPubKey === 'string') {
     scriptPubKey = baddress.toOutputScript(scriptPubKey, this.network)
   }
-
+  console.log(scriptPubKey)
   return this.tx.addOutput(scriptPubKey, value)
 }
 
@@ -732,8 +737,13 @@ TransactionBuilder.prototype.__overMaximumFees = function (bytes) {
   // but all outputs do, and if we have any input value
   // we can immediately determine if the outputs are too small
   var outgoing = this.tx.outs.reduce(function (a, x) { return a + x.value }, 0)
+  //console.log(this.inputs)
+  console.log(incoming)
+  console.log(outgoing)
   var fee = incoming - outgoing
+  console.log(fee)
   var feeRate = fee / bytes
+  console.log(feeRate)
 
   return feeRate > this.maximumFeeRate
 }

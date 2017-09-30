@@ -38,7 +38,8 @@ module.exports = {
       public: 0x0488b41e,
       private: 0x0488ade4
     },
-    pubKeyHash: 0x1cb8,
+    //pubKeyHash: 0x1cb8,
+    pubKeyHash: 0x1d25,
     scriptHash: 0x1cbd,
     wif: 0x80
   }
